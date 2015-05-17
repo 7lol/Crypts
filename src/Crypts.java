@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,24 @@ public class Crypts extends ConsoleProgram {
 			mainMenu();
 		} while (true);
 	}
+	
+	public static boolean askIfOverwrite(Crypts console, String filename, File file) {
+		String option;
+		do {
+			console.getConsole().clear();
+			console.println("Nadpisać Plik? " + filename
+					+ "[T/N]");
+			option = console.readNotEmptyLine().trim();
+			if (option.equalsIgnoreCase("t")) {
+				file.delete();
+				return true;
+			} else if (option.equalsIgnoreCase("n")) {
+				console.println("Zapis anulowano");
+				Crypts.waits(1000);
+				return false;
+			}
+		} while (true);
+	}
 
 	public static String cutExtension(String text) {
 		String filename="";
@@ -26,13 +45,52 @@ public class Crypts extends ConsoleProgram {
 			}
 			return filename;
 		}
-		System.out.println(filename);
 		return text;
 	}
+	
+	public static String getExtension(String text) {
+		String ext="";
+		String temp[] = text.split("\\.");
+		if (temp.length > 1) {
+			ext=temp[temp.length-1];
+			return ext;
+		}
+		return "txt";
+	}
+	
+	public static void progressBar(Crypts console, int max, int now, String statement) {
+		final int MAX_BAR = 10;
+		float x = now * MAX_BAR / max;
+		float y = (max - now) * MAX_BAR / max;
+		if (x != (now-1) * MAX_BAR / max) {
+			console.getConsole().clear();
+			console.println(statement);
+			console.print(" ");
+			for (int i = 0; i <= MAX_BAR; i += 1) {
+				console.print("_");
+			}
+			console.println(" ");
+			console.print("|");
+			for (int i = 0; i <= x; i += 1) {
+				console.print("»");
+			}
+			for (int i = 0; i < y; i += 1) {
+				console.print(" ");
+			}
+			console.println("|");
+			console.print(" ");
+			for (int i = 0; i <= MAX_BAR; i += 1) {
+				console.print("¯");
+			}
+			console.println(" ");
+			Crypts.waits(1);
+		}
+	}
+
 
 	public String readFilename(String statement) {
 		String filename = readNotEmptyLine();
-		if (filename == "esc" || filename == "Esc" || filename == "ESC") {
+		if (filename.equals("esc") || filename.equals("Esc") || filename.equals("ESC")) {
 			println(statement);
 			Crypts.waits(1000);
 			return null;

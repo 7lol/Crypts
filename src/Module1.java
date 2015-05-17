@@ -1,8 +1,4 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 
@@ -13,10 +9,12 @@ public class Module1 extends Modules {
 	boolean back=false;
 	String text;
 	public Code coder;
+	public FileHandler filehandler;
 	
 	public void run(Crypts console,Code coder)
 	{
 		this.coder=coder;
+		filehandler=new TxtHandler();
 		do{
 		menu2(console);
 		}while(!back);
@@ -185,24 +183,13 @@ public class Module1 extends Modules {
 		do {
 			console.getConsole().clear();
 			console.println("Podaj nazwe pliku do wczytania o rozszerzeniu txt");
-			filename = console.readNotEmptyLine();
-			if (filename == "esc" || filename == "Esc" || filename == "ESC") {
-				console.println("Wczytywanie anulowano");
-				Crypts.waits(1000);
-				break;
-			}
+			filename=console.readFilename("Wczytywanie anulowano");
 			filename=Crypts.cutExtension(filename);
-			try (BufferedReader br = new BufferedReader(
-					new FileReader(filename+".txt"))) {
-				if (br.ready()) {
-					String lol = br.readLine();
-					coder.setKeys(lol);
-				}
-				while (br.ready()) {
-					console.words.add((br.readLine()));
-				}
+			try {
+				filehandler.readKeyFile(console, filename, coder);
+				filehandler.readFile(console, filename,coder);
 			} catch (IOException e) {
-				console.println("No file");
+				console.println("No file1");
 				Crypts.waits(2000);
 			}
 		} while (console.words.isEmpty());
@@ -213,48 +200,19 @@ public class Module1 extends Modules {
 			console.println("Talbica slow jest pusta nie ma czego zapisac");
 		}
 		String filename = "";
-		String option = "";
+		String ext = "";
 		while (!console.words.isEmpty()) {
 			console.getConsole().clear();
 			console.println("Podaj nazwe pliku do zapisania(esc by anulowac)");
-			filename = console.readNotEmptyLine();
-			if (filename == "esc" || filename == "Esc" || filename == "ESC") {
-				console.println("Zapis anulowano");
-				Crypts.waits(1000);
-				break;
-			}
+			filename=console.readFilename("Zapis anulowano");
+			ext=Crypts.getExtension(filename);
 			filename=Crypts.cutExtension(filename);
 			try {
-				File file = new File(filename+".txt");
-				if (file.exists()) {
-					boolean exit = false;
-					do {
-						console.getConsole().clear();
-						console.println("Nadpisaæ Plik? " + filename + "[T/N]");
-						option = console.readNotEmptyLine().trim();
-						if (option.equalsIgnoreCase("t")) {
-							file.delete();
-							exit = true;
-						} else if (option.equalsIgnoreCase("n")) {
-							console.println("Zapis anulowano");
-							Crypts.waits(1000);
-							exit = true;
-						}
-					} while (!exit);
-				}
-				if (!file.exists()) {
-					file.createNewFile();
-					FileWriter fw = new FileWriter(file.getAbsoluteFile());
-					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write(coder.getAllKeys());
-					bw.write("\n");
-					for (String word : console.words) {
-						bw.write(word);
-						bw.write("\n");
-					}
-					console.words.clear();
-					bw.close();
-				}
+				File file1 = new File(filename+"."+ext);
+				filehandler.saveFile(console, file1,coder);
+				File file2 = new File(filename+"."+"key");
+				filehandler.saveKeyFile(console, file2,coder);
+				console.words.clear();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
