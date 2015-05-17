@@ -191,14 +191,7 @@ public class Module1 extends Modules {
 				Crypts.waits(1000);
 				break;
 			}
-			String temp[]=filename.split(".");
-			if (temp.length>1)
-			{
-				filename="";
-				for(int i=0;i>temp.length-1;i++){
-					filename+=temp[i];
-				}
-			}
+			filename=Crypts.cutExtension(filename);
 			try (BufferedReader br = new BufferedReader(
 					new FileReader(filename+".txt"))) {
 				if (br.ready()) {
@@ -230,14 +223,7 @@ public class Module1 extends Modules {
 				Crypts.waits(1000);
 				break;
 			}
-			String temp[]=filename.split(".");
-			if (temp.length>1)
-			{
-				filename="";
-				for(int i=0;i>temp.length-1;i++){
-					filename+=temp[i];
-				}
-			}
+			filename=Crypts.cutExtension(filename);
 			try {
 				File file = new File(filename+".txt");
 				if (file.exists()) {
@@ -273,6 +259,5 @@ public class Module1 extends Modules {
 				e.printStackTrace();
 			}
 		}
-		;
 	}
 }

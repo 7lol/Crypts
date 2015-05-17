@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+
 import acm.program.ConsoleProgram;
 
 public class Crypts extends ConsoleProgram {
@@ -13,6 +14,30 @@ public class Crypts extends ConsoleProgram {
 		do {
 			mainMenu();
 		} while (true);
+	}
+
+	public static String cutExtension(String text) {
+		String filename="";
+		String temp[] = text.split("\\.");
+		if (temp.length > 1) {
+			for (int i = 0; i < temp.length - 1; i++) {
+				filename += temp[i];
+				if(i<temp.length - 2)filename +="\\.";
+			}
+			return filename;
+		}
+		System.out.println(filename);
+		return text;
+	}
+
+	public String readFilename(String statement) {
+		String filename = readNotEmptyLine();
+		if (filename == "esc" || filename == "Esc" || filename == "ESC") {
+			println(statement);
+			Crypts.waits(1000);
+			return null;
+		}
+		return filename;
 	}
 
 	/**
@@ -50,7 +75,6 @@ public class Crypts extends ConsoleProgram {
 		}
 	}
 
-
 	private void mainMenu() {
 		int choice;
 		do {
@@ -83,7 +107,7 @@ public class Crypts extends ConsoleProgram {
 			println("Z jakigo algorytmu chcesz korzystac");
 			println("1. Kod Cezara");
 			println("2. RSA");
-			println("3. Elgamal");		
+			println("3. Elgamal");
 			println("4. Cofnij");
 			println("5. Wyjscie");
 			choice = tryParse(readLine());
@@ -109,18 +133,14 @@ public class Crypts extends ConsoleProgram {
 		if (choice == 5)
 			System.exit(0);
 		if (!back)
-		switch (module) {
-		case 1:
-			new Module1().run(this,coder);
-			break;
-		case 2:
-			while (!back) {
-				//menu3();
+			switch (module) {
+			case 1:
+				new Module1().run(this, coder);
+				break;
+			case 2:
+				new Module2().run(this, coder);
+				break;
 			}
-			break;
-		}
 	}
-
-
 
 }

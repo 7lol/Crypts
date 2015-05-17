@@ -23,9 +23,9 @@ public class Rsa extends Code {
 	}
 
 	Rsa(BigInteger e, BigInteger n, BigInteger d) {
+		this.e = e;
 		this.n = n;
 		this.d = d;
-		this.e = e;
 	}
 
 	public boolean keyExist() {
@@ -36,16 +36,16 @@ public class Rsa extends Code {
 
 	public void deleteKey() {
 		if (keyExist()) {
+			e = null;
 			n = null;
 			d = null;
-			e = null;
 		}
 	}
 
 	public void setKeys(String lol) {
-		n = new BigInteger(lol.split("\\s+")[0]);
-		d = new BigInteger(lol.split("\\s+")[1]);
-		e = new BigInteger(lol.split("\\s+")[2]);
+		e = new BigInteger(lol.split("\\s+")[0]);
+		n = new BigInteger(lol.split("\\s+")[1]);
+		d = new BigInteger(lol.split("\\s+")[2]);
 	}
 
 	public String getAllKeys() {

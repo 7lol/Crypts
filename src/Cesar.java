@@ -22,11 +22,11 @@ public class Cesar extends Code {
 	}
 	
 	public void setKeys(String lol) {
-		i2=Crypts.tryParse(lol);
+		i2=Crypts.tryParse(lol.trim());
 	}
 	
 	public void generateKeys() {
-	i2 = new RandomGenerator().nextInt();
+	i2 = new RandomGenerator().nextInt(10);
 	}
 	
 	public String decode(String text2) {
