@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.IOException;
 
 
@@ -184,10 +183,12 @@ public class Module1 extends Modules {
 			console.getConsole().clear();
 			console.println("Podaj nazwe pliku do wczytania o rozszerzeniu txt");
 			filename=console.readFilename("Wczytywanie anulowano");
-			filename=Crypts.cutExtension(filename);
+			if(Crypts.getExtension(filename)==null){
+				filename+=".txt";
+			}
 			try {
 				filehandler.readKeyFile(console, filename, coder);
-				filehandler.readFile(console, filename,coder);
+				filehandler.readFile(console, filename);
 			} catch (IOException e) {
 				console.println("No file1");
 				Crypts.waits(2000);
@@ -200,18 +201,13 @@ public class Module1 extends Modules {
 			console.println("Talbica slow jest pusta nie ma czego zapisac");
 		}
 		String filename = "";
-		String ext = "";
 		while (!console.words.isEmpty()) {
 			console.getConsole().clear();
 			console.println("Podaj nazwe pliku do zapisania(esc by anulowac)");
 			filename=console.readFilename("Zapis anulowano");
-			ext=Crypts.getExtension(filename);
-			filename=Crypts.cutExtension(filename);
 			try {
-				File file1 = new File(filename+"."+ext);
-				filehandler.saveFile(console, file1,coder);
-				File file2 = new File(filename+"."+"key");
-				filehandler.saveKeyFile(console, file2,coder);
+				filehandler.saveFile(console, filename);
+				filehandler.saveKeyFile(console, filename,coder);
 				console.words.clear();
 			} catch (IOException e) {
 				e.printStackTrace();

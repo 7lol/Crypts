@@ -10,17 +10,18 @@ import java.io.IOException;
 public class TxtHandler extends FileHandler {
 
 
-	public void readFile(Crypts console, String filename,Code coder)
+	public void readFile(Crypts console, String filename)
 			throws FileNotFoundException, IOException {
 		BufferedReader br = new BufferedReader(
-				new FileReader(filename + ".txt"));
+				new FileReader(filename));
 		while (br.ready()) {
 			console.words.add((br.readLine()));
 		}
 		br.close();
 	}
 
-	public void saveFile(Crypts console, File file,Code coder) throws IOException {
+	public void saveFile(Crypts console, String filename) throws IOException {
+		File file = new File(filename);
 		if (file.exists()) {
 			if(Crypts.askIfOverwrite(console, file.getName(), file))
 			file.delete();

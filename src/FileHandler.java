@@ -10,17 +10,29 @@ import java.util.List;
 
 public abstract class FileHandler {
 
-	public void readFile(Crypts console, String filename,Code coder) throws FileNotFoundException, IOException {
+	/**
+	 * 
+	 * @param console Crypts, dzieki ktoremu bedzie mozna wypisac cos na konsoli 
+	 * @param filename Nazwa pliku do odczytu
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public void readFile(Crypts console, String filename) throws FileNotFoundException, IOException {
 	}
-
-	public void saveFile(Crypts console, File file,Code coder) throws IOException {
+	/**
+	 * 
+	 * @param console Crypts, dzieki ktoremu bedzie mozna wypisac cos na konsoli 
+	 * @param filename Nazwa pliku do odczytu
+	 * @throws IOException
+	 */
+	public void saveFile(Crypts console, String filename) throws IOException {
 	}
 
 	public void readKeyFile(Crypts console, String filename,Code coder)
 			throws IOException {
 		List<String> words2 = new ArrayList<String>();
 		BufferedReader br = new BufferedReader(
-				new FileReader(filename + ".key"));
+				new FileReader(Crypts.getKeyName(filename)));
 		while (br.ready()) {
 			words2.add((br.readLine()));
 		}
@@ -30,14 +42,14 @@ public abstract class FileHandler {
 		}
 		br.close();
 		coder.setKeys(lol);
-		System.out.println(coder.getAllKeys());
-		System.out.println(lol);
 	}
 
 	@SuppressWarnings("resource")
-	public void saveKeyFile(Crypts console, File file,Code coder) throws IOException {
+	public void saveKeyFile(Crypts console, String filename,Code coder) throws IOException {
+		File file = new File(Crypts.getKeyName(filename));
 		if (file.exists()) {
-			file.delete();
+			if(Crypts.askIfOverwrite(console, file.getName(), file)){
+			file.delete();}
 		}
 		if (!file.exists()) {
 			file.createNewFile();

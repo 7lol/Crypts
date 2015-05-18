@@ -17,6 +17,14 @@ public class Crypts extends ConsoleProgram {
 		} while (true);
 	}
 	
+	public static String getNewFilename(String filename){
+		return new String(cutExtension(filename)+"_new."+getExtension(filename));		
+	}
+	public static String getKeyName(String filename){
+		return new String(cutExtension(filename)+".key");		
+	}
+	
+	
 	public static boolean askIfOverwrite(Crypts console, String filename, File file) {
 		String option;
 		do {
@@ -55,7 +63,7 @@ public class Crypts extends ConsoleProgram {
 			ext=temp[temp.length-1];
 			return ext;
 		}
-		return "txt";
+		return null;
 	}
 	
 	public static void progressBar(Crypts console, int max, int now, String statement) {
@@ -74,7 +82,7 @@ public class Crypts extends ConsoleProgram {
 			for (int i = 0; i <= x; i += 1) {
 				console.print("»");
 			}
-			for (int i = 0; i < y; i += 1) {
+			for (int i = 0;(i < y+1); i += 1) {
 				console.print(" ");
 			}
 			console.println("|");
@@ -89,6 +97,7 @@ public class Crypts extends ConsoleProgram {
 
 
 	public String readFilename(String statement) {
+		println("wpisz esc by anulowac");
 		String filename = readNotEmptyLine();
 		if (filename.equals("esc") || filename.equals("Esc") || filename.equals("ESC")) {
 			println(statement);

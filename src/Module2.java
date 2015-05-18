@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,8 +74,6 @@ public class Module2 extends Modules {
 		List<String> words2 = new ArrayList<String>();
 		for (int i = 0; i < console.words.size(); i++) {
 			words2.add(coder.encode(console.words.get(i)));
-			System.out.println(coder.encode(console.words.get(i)) + " "
-					+ console.words.get(i));
 			Crypts.progressBar(console, console.words.size() - 1, i,
 					"Trwa kodowanie");
 		}
@@ -96,7 +93,6 @@ public class Module2 extends Modules {
 
 	private void encodeFile(Crypts console) {
 		String filename = "";
-		String ext = "";
 		boolean keySaved;
 		do {
 			console.getConsole().clear();
@@ -105,26 +101,26 @@ public class Module2 extends Modules {
 			console.println("Podaj nazwe pliku do zakodowania(wpisz esc by anulowac)");
 			if ((filename = console.readFilename("Kodowanie anulowano")) == null)
 				break;
-			ext= Crypts.getExtension(filename);
-			filename = Crypts.cutExtension(filename);
+			if(Crypts.getExtension(filename)==null){
+				filename+=".txt";
+			}
 			coder.generateKeys();
 			try {
-				filehandler.readFile(console, filename,coder);
+				filehandler.readFile(console, filename);
 			} catch (IOException e2) {
 				console.println("Brak pliku");
 				Crypts.waits(2000);
 				e2.printStackTrace();
 			}
+			filename=Crypts.getNewFilename(filename);
 			if(!console.words.isEmpty())
 			try {
-				File file = new File(filename + "_new.key");
-				filehandler.saveKeyFile(console, file,coder);
+				filehandler.saveKeyFile(console,filename,coder);
 				keySaved = true;
 			} catch (IOException e1) {
 				console.println("Blad zapisu klucza");
 				Crypts.waits(2000);
 				keySaved = false;
-				e1.printStackTrace();
 			}else{
 				console.println("Plik jest pusty");
 				Crypts.waits(2000);
@@ -132,9 +128,8 @@ public class Module2 extends Modules {
 			if (keySaved)
 			{
 				encodeWordList(console,coder);
-				File file = new File(filename + "_new."+ext);
 				try {
-					filehandler.saveFile(console, file,coder);
+					filehandler.saveFile(console,filename);
 					coder.deleteKey();
 					break;
 				} catch (IOException e) {
@@ -149,7 +144,6 @@ public class Module2 extends Modules {
 		console.words.clear();
 		coder.deleteKey();
 		String filename = "";
-		String ext = "";
 		boolean readedKey;
 		do {
 			readedKey = true;
@@ -157,20 +151,20 @@ public class Module2 extends Modules {
 			console.println("Podaj nazwe pliku do odszyfrowania");
 			if ((filename = console.readFilename("Wczytawanie anulowano")) == null)
 				break;
-			ext= Crypts.getExtension(filename);
-			filename = Crypts.cutExtension(filename);
+			if(Crypts.getExtension(filename)==null){
+				filename+=".txt";
+			}
 			try {
 				filehandler.readKeyFile(console, filename,coder);
 			} catch (IOException e1) {
 				console.println("Brak pliku z kluczem");
 				Crypts.waits(2000);
 				readedKey = false;
-				e1.printStackTrace();
 			}
 			console.words.clear();
 			if (readedKey) {
 				try {
-					filehandler.readFile(console, filename,coder);
+					filehandler.readFile(console, filename);
 				} catch (IOException e) {
 					console.println("Brak zaszyfrowanego pliku");
 					Crypts.waits(2000);
@@ -178,13 +172,12 @@ public class Module2 extends Modules {
 			}
 		} while (console.words.isEmpty());
 		decodeWordList(console, coder);
+		filename=Crypts.getNewFilename(filename);
 		try {
-			File file = new File(filename + "_new."+ext);
-			filehandler.saveFile(console, file,coder);
+			filehandler.saveFile(console, filename);
 			coder.deleteKey();
 		} catch (IOException e) {
 			console.println("Blad, nie udalo sie zapisac pliku");
-			e.printStackTrace();
 		}
 	}
 
