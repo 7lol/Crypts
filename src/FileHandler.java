@@ -8,27 +8,40 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import acm.io.IOConsole;
+
 public abstract class FileHandler {
+	public List<String> words = new ArrayList<String>();
 
 	/**
-	 * 
 	 * @param console Crypts, dzieki ktoremu bedzie mozna wypisac cos na konsoli 
 	 * @param filename Nazwa pliku do odczytu
+	 * @return zwraca liste wczytanych slow
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void readFile(Crypts console, String filename) throws FileNotFoundException, IOException {
+	public List<String> readFile(IOConsole console, String filename) throws FileNotFoundException, IOException {
+		return null;
 	}
+	
 	/**
 	 * 
 	 * @param console Crypts, dzieki ktoremu bedzie mozna wypisac cos na konsoli 
 	 * @param filename Nazwa pliku do odczytu
+	 * @param words lista lini do zapisania
 	 * @throws IOException
 	 */
-	public void saveFile(Crypts console, String filename) throws IOException {
+	public void saveFile(IOConsole console, String filename, List<String> words) throws IOException {
 	}
-
-	public void readKeyFile(Crypts console, String filename,Code coder)
+	
+	/**
+	 * 
+	 * @param console
+	 * @param filename
+	 * @param coder
+	 * @throws IOException
+	 */
+	public void readKeyFile(IOConsole console, String filename,Code coder)
 			throws IOException {
 		List<String> words2 = new ArrayList<String>();
 		BufferedReader br = new BufferedReader(
@@ -44,16 +57,22 @@ public abstract class FileHandler {
 		coder.setKeys(lol);
 	}
 
+	/**
+	 * Zapisywanie kluczu szyfrowania do pliku
+	 * 
+	 * @param console interface programu-konsola
+	 * @param filename nazwa pliku do zapisania
+	 * @param coder klasa modelujaca szyfrowania
+	 * @throws IOException
+	 */
 	@SuppressWarnings("resource")
-	public void saveKeyFile(Crypts console, String filename,Code coder) throws IOException {
+	public void saveKeyFile(IOConsole console, String filename,Code coder) throws IOException {
 		File file = new File(Crypts.getKeyName(filename));
 		if (file.exists()) {
-			if(Crypts.askIfOverwrite(console, file.getName(), file)){
+			if(Crypts.askIfOverwrite(console,file)){
 			file.delete();}
 		}
 		if (!file.exists()) {
-			file.createNewFile();
-			System.out.println(coder.getAllKeys());
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 			String temp[] = coder.getAllKeys().split(" ");

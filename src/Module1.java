@@ -1,25 +1,32 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import acm.io.IOConsole;
 
 
 public class Module1 extends Modules {
-	/*
-	 * Menu 2 block
-	 */
+
 	boolean back=false;
 	String text;
 	public Code coder;
 	public FileHandler filehandler;
+	List<String> words=new ArrayList<String>();
 	
-	public void run(Crypts console,Code coder)
+	/**
+	 * Start modulu
+	 * @param console interface programu-konsola
+	 * @param coder algorytm szyfrowania
+	 */
+	public void run(IOConsole console,Code coder)
 	{
 		this.coder=coder;
 		filehandler=new TxtHandler();
 		do{
-		menu2(console);
+		menu2(console,words);
 		}while(!back);
 	}
 	
-	private void menu2(Crypts console) {
+	private List<String> menu2(IOConsole  console,List<String> words) {
 		int choice;
 		String text = "";
 		if (coder.getClass().equals(Cesar.class)) {
@@ -32,7 +39,7 @@ public class Module1 extends Modules {
 			text = "kod Elgamal";
 		}
 		do {
-			console.getConsole().clear();
+			console.clear();
 			console.println("Program kodujacy i dekodujacy " + text);
 			console.println("Co chcesz zrobic?");
 			console.println("1. Kodowanie slow");
@@ -48,32 +55,34 @@ public class Module1 extends Modules {
 			if (choice <= 9 && choice >= 1)
 				break;
 		} while (true);
-		choices2(choice,console);
+		words=choices2(choice,console,words);
+		return words;
 	}
 
-	private void choices2(int choice,Crypts console) {
-		switch (choice % 10) {
+	private List<String> choices2(int choice,IOConsole console,List<String> words) {
+		switch (choice) {
 		case 1:
-			encodeWords(console);
+			encodeWords(console,words);
 			break;
 		case 2:
-			decodeWords(console);
+			decodeWords(console,words);
 			break;
 		case 3:
-			addOneWord(console);
+			words.add(addOneWord(console));
 			break;
 		case 4:
-			readOneWord(console);
+			readOneWord(console,words);
 			break;
 		case 5:
-			console.words.clear();
+			words.clear();
 			coder.deleteKey();
 			break;
 		case 6:
-			saveListToFile(console);
+			saveListToFile(console,words);
 			break;
 		case 7:
-			loadListFromFile(console);
+			words.clear();
+			words.addAll(loadListFromFile(console));
 			break;
 		case 8:
 			back = true;
@@ -83,44 +92,45 @@ public class Module1 extends Modules {
 		default:
 			break;
 		}
+		return words;
 	}
 	
 	/*
 	 * block responsible for the console io actions
 	 */
-	private void readOneWord(Crypts console) {
+	private void readOneWord(IOConsole console,List<String> words) {
 		int j = 0;
-		if (console.words.isEmpty()) {
+		if (words.isEmpty()) {
 			console.println("Nie ma zapisanych zadnych slow");
 			Crypts.waits(1000);
 			return;
 		} else {
 			do {
 				console.println("Podaj ktore chcesz slowo poznac");
-				console.println("Jest ich " + console.words.size());
+				console.println("Jest ich " + words.size());
 				j = Crypts.tryParse(console.readLine());
-				if (j <= console.words.size() && j >= 0)
+				if (j <= words.size() && j >= 0)
 					break;
 			} while (true);
-			console.println(coder.decode(console.words.get(j - 1)));
+			console.println(coder.decode(words.get(j - 1)));
 			Crypts.waits(2000);
 		}
 	}
 
-	private void decodeWords(Crypts console) {
-		if (console.words.isEmpty()) {
+	private void decodeWords(IOConsole console,List<String> words) {
+		if (words.isEmpty()) {
 			console.println("Nie ma zapisanych zadnych slow");
 			Crypts.waits(1000);
 			return;
 		} else {
-			for (String word : console.words) {
+			for (String word : words) {
 				console.println(coder.decode(word));
 			}
 			Crypts.waits(2000);
 		}
 	}
 
-	private void encodeWords(Crypts console) {
+	private void encodeWords(IOConsole console,List<String> words) {
 		int x = 0;
 		do {
 			console.println("Podaj ilosc slow(Max 10)");
@@ -130,10 +140,10 @@ public class Module1 extends Modules {
 		} while (true);
 		coder = makeKeyIfNeeded(console);
 		for (; x >= 1; x--)
-			addOneWord(x,console);
+			words.add(addOneWord(x,console));
 	}
 
-	private Code makeKeyIfNeeded(Crypts console) {
+	private Code makeKeyIfNeeded(IOConsole console) {
 		if (coder.getClass().equals(Cesar.class)) {
 			int i = 0;
 			if (!coder.keyExist())
@@ -157,58 +167,64 @@ public class Module1 extends Modules {
 		return coder;
 	}
 
-	private void addOneWord(int x,Crypts console) {
-		addOneWord(" " + x + " ",console);
+	private String addOneWord(int x,IOConsole console) {
+		return addOneWord(" " + x + " ",console);
 	}
 
-	private void addOneWord(String x,Crypts console) {
+	private String addOneWord(String x,IOConsole console) {
 		makeKeyIfNeeded(console);
 		console.println("Podaj" + x + "slowo");
-		text = console.readNotEmptyLine();
-		console.words.add(coder.encode(text));
+		text = Crypts.readNotEmptyLine(console);
+		return coder.encode(text);
 	}
 
-	private void addOneWord(Crypts console) {
-		addOneWord(" ",console);
+	private String addOneWord(IOConsole console) {
+		return addOneWord(" ",console);
 	}
 
 	/*
 	 * file block
 	 */
-	private void loadListFromFile(Crypts console) {
-		console.words.clear();
+	private List<String> loadListFromFile(IOConsole console) {
+		List<String> words= new ArrayList<String>();
+		words.clear();
 		coder.deleteKey();
 		String filename = "";
 		do {
-			console.getConsole().clear();
+			console.clear();
 			console.println("Podaj nazwe pliku do wczytania o rozszerzeniu txt");
-			filename=console.readFilename("Wczytywanie anulowano");
+			filename=Crypts.readFilename("Wczytywanie anulowano",console);
+			if (filename==null) return null;
 			if(Crypts.getExtension(filename)==null){
 				filename+=".txt";
 			}
 			try {
 				filehandler.readKeyFile(console, filename, coder);
-				filehandler.readFile(console, filename);
+				words=filehandler.readFile(console, filename);
 			} catch (IOException e) {
 				console.println("No file1");
 				Crypts.waits(2000);
 			}
-		} while (console.words.isEmpty());
+		} while (words.isEmpty());
+		return words;
 	}
 
-	private void saveListToFile(Crypts console) {
-		if (console.words.isEmpty()) {
+	private void saveListToFile(IOConsole console, List<String> words) {
+		if (words.isEmpty()) {
 			console.println("Talbica slow jest pusta nie ma czego zapisac");
 		}
 		String filename = "";
-		while (!console.words.isEmpty()) {
-			console.getConsole().clear();
+		while (!words.isEmpty()) {
+			console.clear();
 			console.println("Podaj nazwe pliku do zapisania(esc by anulowac)");
-			filename=console.readFilename("Zapis anulowano");
+			filename=Crypts.readFilename("Zapis anulowano",console);
+			if (Crypts.getExtension(filename)==null){
+				filename+=".txt";
+			}
 			try {
-				filehandler.saveFile(console, filename);
+				filehandler.saveFile(console, filename,words);
 				filehandler.saveKeyFile(console, filename,coder);
-				console.words.clear();
+				words.clear();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

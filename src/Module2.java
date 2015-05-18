@@ -2,20 +2,36 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import acm.io.IOConsole;
+
 public class Module2 extends Modules {
 	boolean back = false;
 	String text;
 	public Code coder;
 	public FileHandler filehandler;
 
-	public void run(Crypts console, Code coder) {
+	/**
+	 * Start modulu
+	 * 
+	 * @param console
+	 *            interface programu-konsola
+	 * @param coder
+	 *            algorytm szyfrowania
+	 */
+	public void run(IOConsole console, Code coder) {
 		this.coder = coder;
 		do {
-			menu2(console);
+			menu(console);
 		} while (!back);
 	}
 
-	private void menu2(Crypts console) {
+	/**
+	 * menu modulu
+	 * 
+	 * @param console
+	 *            interface programu-konsola
+	 */
+	private void menu(IOConsole console) {
 		int choice;
 		String text = "";
 		if (coder.getClass().equals(Cesar.class)) {
@@ -28,13 +44,13 @@ public class Module2 extends Modules {
 			text = "kod Elgamal";
 		}
 		do {
-			console.getConsole().clear();
+			console.clear();
 			console.println("Program kodujacy i dekodujacy " + text);
 			console.println("Co chcesz zrobic?");
 			console.println("1. Kodowanie pliku txt");
 			console.println("2. Dekodowanie pliku txt");
-		//	console.println("3. Kodowanie pliku");
-		//	console.println("4. Dekodowanie pliku");
+			// console.println("3. Kodowanie pliku");
+			// console.println("4. Dekodowanie pliku");
 			console.println("5. Cofnij");
 			console.println("6. Wyjscie");
 			choice = Crypts.tryParse(console.readLine());
@@ -46,14 +62,22 @@ public class Module2 extends Modules {
 		choices2(choice, console);
 	}
 
-	private void choices2(int choice, Crypts console) {
+	/**
+	 * Sprawdzanie opcji pobranych w menu
+	 * 
+	 * @param choice
+	 *            opcja pobrana w menu
+	 * @param console
+	 *            interface programu-konsola
+	 */
+	private void choices2(int choice, IOConsole console) {
 		switch (choice % 10) {
 		case 1:
-			filehandler=new TxtHandler();
+			filehandler = new TxtHandler();
 			encodeFile(console);
 			break;
 		case 2:
-			filehandler=new TxtHandler();
+			filehandler = new TxtHandler();
 			decodeFile(console);
 			break;
 		case 3:
@@ -70,66 +94,98 @@ public class Module2 extends Modules {
 		}
 	}
 
-	private void encodeWordList(Crypts console, Code coder) {
+	/**
+	 * kodowanie listy slow
+	 * 
+	 * @param console
+	 *            interface programu-konsola
+	 * @param coder
+	 *            algorytm szyfrujacy
+	 * @param words
+	 *            lista slow do zakodowania
+	 * @return zakodowana lista slow
+	 */
+	private List<String> encodeWordList(IOConsole console, Code coder,
+			List<String> words) {
 		List<String> words2 = new ArrayList<String>();
-		for (int i = 0; i < console.words.size(); i++) {
-			words2.add(coder.encode(console.words.get(i)));
-			Crypts.progressBar(console, console.words.size() - 1, i,
-					"Trwa kodowanie");
+		for (int i = 0; i < words.size(); i++) {
+			words2.add(coder.encode(words.get(i)));
+			Crypts.progressBar(console, words.size() - 1, i, "Trwa kodowanie");
 		}
-		console.words = words2;
+		return words2;
 	}
 
-	private void decodeWordList(Crypts console, Code coder) {
+	/**
+	 * odkodowywanie listy slow
+	 * 
+	 * @param console
+	 *            interface programu- konsola
+	 * @param coder
+	 *            algorytm szyfrujacy
+	 * @param words
+	 *            lista slow do odkodowania
+	 * @return odkodowana lista slow
+	 */
+	private List<String> decodeWordList(IOConsole console, Code coder,
+			List<String> words) {
 		List<String> words2 = new ArrayList<String>();
-		for (int i = 0; i < console.words.size(); i++) {
-			words2.add(coder.decode(console.words.get(i)));
-			Crypts.progressBar(console, console.words.size() - 1, i,
-					"Trwa kodowanie");
+		for (int i = 0; i < words.size(); i++) {
+			words2.add(coder.decode(words.get(i)));
+			Crypts.progressBar(console, words.size() - 1, i, "Trwa Odkodowanie");
 		}
-		console.words = words2;
+		console.println("Dekodowanie zakonczone");
+		Crypts.waits(2000);
+		return words2;
 	}
 
-
-	private void encodeFile(Crypts console) {
+	/**
+	 * Wczytywanie plikow Kodowanie pliku linia po lini Zapisanie klucza oraz
+	 * zakodowanej listy lini.
+	 * 
+	 * @param console
+	 *            interface programu-konsola
+	 */
+	private void encodeFile(IOConsole console) {
+		List<String> words = new ArrayList<String>();
 		String filename = "";
 		boolean keySaved;
 		do {
-			console.getConsole().clear();
-			console.words.clear();
+			console.clear();
+			words.clear();
 			keySaved = false;
 			console.println("Podaj nazwe pliku do zakodowania(wpisz esc by anulowac)");
-			if ((filename = console.readFilename("Kodowanie anulowano")) == null)
+			if ((filename = Crypts.readFilename("Kodowanie anulowano", console)) == null)
 				break;
-			if(Crypts.getExtension(filename)==null){
-				filename+=".txt";
+			if (Crypts.getExtension(filename) == null) {
+				filename += ".txt";
 			}
 			coder.generateKeys();
+			Crypts.progressBar(console, 10, 0, "Trwa Wczytywanie plikow");
 			try {
-				filehandler.readFile(console, filename);
+				words = filehandler.readFile(console, filename);
 			} catch (IOException e2) {
 				console.println("Brak pliku");
 				Crypts.waits(2000);
 				e2.printStackTrace();
 			}
-			filename=Crypts.getNewFilename(filename);
-			if(!console.words.isEmpty())
-			try {
-				filehandler.saveKeyFile(console,filename,coder);
-				keySaved = true;
-			} catch (IOException e1) {
-				console.println("Blad zapisu klucza");
-				Crypts.waits(2000);
-				keySaved = false;
-			}else{
+			filename = Crypts.getNewFilename(filename);
+			if (!words.isEmpty())
+				try {
+					filehandler.saveKeyFile(console, filename, coder);
+					keySaved = true;
+				} catch (IOException e1) {
+					console.println("Blad zapisu klucza");
+					Crypts.waits(2000);
+					keySaved = false;
+				}
+			else {
 				console.println("Plik jest pusty");
 				Crypts.waits(2000);
 			}
-			if (keySaved)
-			{
-				encodeWordList(console,coder);
+			if (keySaved) {
+				words = encodeWordList(console, coder, words);
 				try {
-					filehandler.saveFile(console,filename);
+					filehandler.saveFile(console, filename, words);
 					coder.deleteKey();
 					break;
 				} catch (IOException e) {
@@ -139,42 +195,51 @@ public class Module2 extends Modules {
 		} while (true);
 	}
 
-
-	private void decodeFile(Crypts console) {
-		console.words.clear();
+	/**
+	 * Wczytywanie plikow oraz klucza Odkod owywanie pliku linia po lini oraz
+	 * odkodowanej listy lini.
+	 * 
+	 * @param console
+	 *            interface programu-konsola
+	 */
+	private void decodeFile(IOConsole console) {
+		List<String> words = new ArrayList<String>();
+		words.clear();
 		coder.deleteKey();
 		String filename = "";
 		boolean readedKey;
 		do {
 			readedKey = true;
-			console.getConsole().clear();
+			console.clear();
 			console.println("Podaj nazwe pliku do odszyfrowania");
-			if ((filename = console.readFilename("Wczytawanie anulowano")) == null)
+			if ((filename = Crypts.readFilename("Wczytawanie anulowano",
+					console)) == null)
 				break;
-			if(Crypts.getExtension(filename)==null){
-				filename+=".txt";
+			if (Crypts.getExtension(filename) == null) {
+				filename += ".txt";
 			}
 			try {
-				filehandler.readKeyFile(console, filename,coder);
+				filehandler.readKeyFile(console, filename, coder);
 			} catch (IOException e1) {
 				console.println("Brak pliku z kluczem");
 				Crypts.waits(2000);
 				readedKey = false;
 			}
-			console.words.clear();
+			words.clear();
+			Crypts.progressBar(console, 10, 0, "Trwa Wczytywanie plikow");
 			if (readedKey) {
 				try {
-					filehandler.readFile(console, filename);
+					words = filehandler.readFile(console, filename);
 				} catch (IOException e) {
 					console.println("Brak zaszyfrowanego pliku");
 					Crypts.waits(2000);
 				}
 			}
-		} while (console.words.isEmpty());
-		decodeWordList(console, coder);
-		filename=Crypts.getNewFilename(filename);
+		} while (words.isEmpty());
+		words = decodeWordList(console, coder, words);
+		filename = Crypts.getNewFilename(filename);
 		try {
-			filehandler.saveFile(console, filename);
+			filehandler.saveFile(console, filename, words);
 			coder.deleteKey();
 		} catch (IOException e) {
 			console.println("Blad, nie udalo sie zapisac pliku");

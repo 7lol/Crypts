@@ -4,28 +4,43 @@ import java.util.Random;
 import acm.util.RandomGenerator;
 
 public class Elgamal extends Code {
-	private int keysBitLength = 128;
+	private int keysBitLength = 128; //dlugosc klucza
 	BigInteger p; // czesc klucza publicznego (p, e1, e2)
 	BigInteger e1; // czesc klucza publicznego (p, e1, e2)
 	BigInteger e2; // czesc klucza publicznego (p, e1, e2)
 	BigInteger d; // klucz prywatny
 	Random rand = new RandomGenerator();
 
+	/**
+	 * 
+	 */
 	Elgamal() {
 		deleteKey();
 	}
 
+	/**
+	 * 
+	 * @param needKeys
+	 *            <code>true</code> klucz bedzie wygenerowany <code>false</code>
+	 *            nie ma potrzeby generowac klucza
+	 */
 	Elgamal(boolean needKeys) {
 		if (needKeys)
 			generateKeys();
 	}
 
+	/**
+	 * 
+	 */
 	public boolean keyExist() {
 		if ((p == null) || (e1 == null) || (e2 == null) || (d == null))
 			return false;
 		return true;
 	}
 
+	/**
+	 * 
+	 */
 	public void deleteKey() {
 		p = null;
 		e1 = null;
@@ -33,6 +48,9 @@ public class Elgamal extends Code {
 		d = null;
 	}
 
+	/**
+	 * 
+	 */
 	public void setKeys(String lol) {
 		p = new BigInteger(lol.split("\\s+")[0]);
 		e1 = new BigInteger(lol.split("\\s+")[1]);
@@ -40,10 +58,16 @@ public class Elgamal extends Code {
 		d = new BigInteger(lol.split("\\s+")[3]);
 	}
 
+	/**
+	 * 
+	 */
 	public String getAllKeys() {
 		return new String(p + " " + e1 + " " + e2 + " " + d);
 	}
 
+	/**
+	 * 
+	 */
 	public String encode(String text) {
 		BigInteger X = new BigInteger(text.getBytes());
 		BigInteger r = BigInteger.probablePrime(keysBitLength, rand);
@@ -53,6 +77,9 @@ public class Elgamal extends Code {
 
 	}
 
+	/**
+	 * 
+	 */
 	public String decode(String text) {
 		String texts[] = text.split(" ");
 		BigInteger EC = new BigInteger(texts[0]);
@@ -63,6 +90,9 @@ public class Elgamal extends Code {
 
 	}
 
+	/**
+	 * 
+	 */
 	public void generateKeys() {
 		p = BigInteger.probablePrime(keysBitLength, rand);
 		e1 = BigInteger.probablePrime(keysBitLength - 1, rand);
